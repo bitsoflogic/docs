@@ -1,0 +1,72 @@
+---
+title: 'Drin'
+description: 'What's the best experience you could have as a frontend developer when dealing with the backend?'
+---
+
+## Defining the backend
+
+Start with a User object
+
+```ts
+export type User = {
+  id: string
+  name: string
+  email: string
+}
+```
+
+Then, associate some Posts with them:
+
+```ts
+export type Post = {
+  id: string
+  title: string
+  author: User
+}
+```
+
+Now, you can query them:
+
+```ts
+const { User, Post } = db;
+
+const user = User.get({ email })
+// { id: 'some-id', email: 'john@abc.com', name: 'John Doe' }
+```
+
+```ts
+const post = Post.get({ id })
+// The `author` is not included by default, since it's a relationship
+// { id: 'another-id', title: 'Some Post' }
+```
+
+You can include related records in your queries:
+
+```ts
+const post = Post.get({ id, author: true })
+// { id: 'another-id', title: 'Some Post', author: { id: 'some-id', email: 'john@abc.com', name: 'John Doe' }}
+```
+
+Relationships can be defined dynamically:
+
+```ts
+const user = User.get({
+  email,
+  posts: Post.filter((post, user) => { post.author === user.id }) 
+})
+// { id: 'some-id', email: 'john@abc.com', name: 'John Doe', posts: [...] }
+```
+
+You can fetch all records with `all`:
+
+```ts
+const posts = Post.all({ author: user.id })
+// [{ id: 'another-id', title: 'Some Post', author: { id: 'some-id', email: 'john@abc.com', name: 'John Doe' } }]
+```
+
+Realtime queries with `watch`:
+
+```ts
+const posts = Post.all({ author: user.id })
+posts.on('data', processPosts)
+```
