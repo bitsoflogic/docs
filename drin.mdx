@@ -25,6 +25,12 @@ export type Post = {
 }
 ```
 
+Then, build the backend:
+
+```sh
+$ drin migrate
+```
+
 Now, you can query them:
 
 ```ts
@@ -67,6 +73,6 @@ const posts = Post.all({ author: user.id })
 Realtime queries with `watch`:
 
 ```ts
-const posts = Post.all({ author: user.id })
+const posts = Post.watch({ author: user.id })
 posts.on('data', processPosts)
 ```
